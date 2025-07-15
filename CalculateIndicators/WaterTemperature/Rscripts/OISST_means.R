@@ -1,5 +1,5 @@
 setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
-ddd<-read.csv("L1_SST_data_ProcessedAUG30_2021.csv", header = TRUE)#takes awhile
+ddd<-read.csv("L1_SST_data_ProcessedOCT23_2024.csv", header = TRUE)#takes awhile
 
 ####The Seasons
 ddd$season<-NA
@@ -17,7 +17,6 @@ lme_SST<-aggregate(temp ~ year + season + EPU, FUN = mean, data = ddd)#by EPU
 MAB_SST<-lme_SST[lme_SST$EPU == "MAB",]
 NYB_SST<-aggregate(temp ~ year + season + NYB, FUN = mean, data = ddd)#NYB
 NYB_SST<-NYB_SST[NYB_SST$NYB == "NYB",]
-
 
 season="fall"
 season="spring"
@@ -67,5 +66,5 @@ plot(SSTindicators[SSTindicators$Variable == "summer_OISST", "Year"],
 
 
 #write combined dataset to file
-setwd("~/Desktop/NYB Indicators/Final_timeseries")
-write.csv(SSTindicators, "OISST_Means_AUG_31_2021.csv")
+setwd("/Users/ian/Desktop/NYB Indicators/Final_Timeseries_Figures/Timeseries_2024/")
+write.csv(SSTindicators, "OISST_Means_OCT_23_2024.csv")

@@ -16,10 +16,10 @@ library(dplyr)
 
 
 ```{r cars}
-setwd("/Users/nyelab/Desktop/NYB Indicators/NYB_Indicators_Calculations/Final_Timeseries_Figures/Timeseries_Files_2023")
-b_nyh = read.csv("Wind_buoy2_Aug_14_2023.csv")
-b_tt  = read.csv("Wind_buoy4_Aug_14_2023.csv")
-b_isl = read.csv("Wind_buoy5_Aug_14_2023.csv")
+setwd("/Users/ian/Desktop/NYB Indicators/Final_Timeseries_Figures/Timeseries_Files_2023")
+b_nyh = read.csv("Wind_buoynyh_Oct_15_2024.csv")
+b_tt  = read.csv("Wind_buoytt_Oct_15_2024.csv")
+b_isl = read.csv("Wind_buoyisl_Oct_15_2024.csv")
 
 ```
 
@@ -31,10 +31,10 @@ b_tt$month  <- format(as.Date(b_tt$datetime), "%m")
 b_isl$month <- format(as.Date(b_isl$datetime), "%m")
 ```
 
-## Exclude some really early data from Texas Tower
+## Exclude some really early data from ISL Buoy
 
 ```{r}
-b_tt <- b_tt[b_tt$year > 1985, ]
+b_isl <- b_isl[b_isl$year > 1990, ]
 ```
 
 ## Experimenting with winds greater than a certain threshhold (90th percentile)
@@ -204,41 +204,75 @@ warnings_isl$buoy <- 'South of Islip'
 
 all_warnings <- rbind(warnings_nyh, warnings_tt, warnings_isl)
 
+# Remove 2008 for NYH and 2009 for ISL because these are incomplete
+view(df[c(which(df$year==2008 & df$buoy=='New York Harbor'),
+  which(df$year==2009 & df$buoy=='South of Islip')),])
 
-variable_names <- list(
-  "winter" = "Winter" ,
-  "spring" = "Spring",
-  "summer" = "Summer",
-  "fall" = "Fall"
-)
+df <- all_warnings
+view(df)
 
-
+# Rename seasons
+all_warnings$season <- as.factor(all_warnings$season)
+levels(all_warnings$season) <- c("Fall", "Spring", "Summer", "Winter")
 
 buoy_names <- c('New York Harbor', 'South of Islip', 'Texas Tower')
 
+# variable_labeller2 <- function(variable,value){
+#   if (variable=='season') {
+#   return(variable_names[value])
+#   } else {
+#     return(buoy_names)
+#   }
+# }
 
-variable_labeller2 <- function(variable,value){
-  if (variable=='season') {
-  return(variable_names[value])
-  } else {
-    return(buoy_names)
-  }
-}
 ggplot(all_warnings, aes(x=year, y=n_scw, color=buoy))+
   geom_line(stat='identity')+
-  facet_grid(season~buoy, scales="free", space="free_x",  labeller= variable_labeller2) +
+  # facet_grid(season~buoy, scales="free", space="free_x",  labeller= variable_labeller2) +
+  facet_grid(season~buoy, scales="free", space="free_x") + 
   theme_bw() +
-  labs (y = bquote("Number of Days"), x = '', title = 'Small Craft Warning Days') + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5), plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face = 'bold'), axis.text= element_text(color = 'black', size = 12))
-  
-
-
+  labs (y = bquote("Number of Days"), x = '', title = 'Small Craft Warning Days') +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5), plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face   = 'bold'), axis.text= element_text(color = 'black', size = 12))
 
 ggplot(all_warnings, aes(x=year, y=n_tsw, color=buoy))+
   geom_line(stat='identity')+
-  facet_grid(season~buoy, scales="free", space="free_x",  labeller= variable_labeller2)
+  # facet_grid(season~buoy, scales="free", space="free_x",  labeller= variable_labeller2)
+  facet_grid(season~buoy, scales="free", space="free_x")
 
+
+
+
+
+################################################################################
+
+# # Using the new labeller API
+# variable_labeller2 <- function(df) {
+#   if (df$variable == 'season') {
+#     return(variable_names[df$value])
+#   } else {
+#     return(buoy_names)
+#   }
+# }
+# 
+# ggplot(all_warnings, aes(x=year, y=n_scw, color=buoy)) +
+#   geom_line(stat='identity') +
+#   facet_grid(season ~ buoy, scales = "free", space = "free_x", 
+#              labeller = labeller(season = variable_labeller2, buoy = variable_labeller2)) +
+#   theme_bw() +
+#   labs(y = bquote("Number of Days"), x = '', title = 'Small Craft Warning Days') + 
+#   theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 0.5),
+#         plot.title = element_text(size = 16, face = 'bold', hjust = 0.5),
+#         axis.title = element_text(size = 14, face = 'bold'),
+#         axis.text = element_text(color = 'black', size = 12))
+# 
+# ggplot(all_warnings, aes(x=year, y=n_tsw, color=buoy)) +
+#   geom_line(stat='identity') +
+#   facet_grid(season ~ buoy, scales = "free", space = "free_x", 
+#              labeller = labeller(season = variable_labeller2, buoy = variable_labeller2)) +
+#   theme_bw() +
+#   labs(y = bquote("Number of Days"), x = '', title = 'Small Craft Warning Days') +
 ```
+
+
 # NY Harbor
 ```{r}
 nyh_winter = all_warnings[which(all_warnings$buoy == 'New York Harbor' & all_warnings$season == 'winter'), ] 
@@ -692,3 +726,5 @@ ggplot(strengthdirection_wind[strengthdirection_wind$dir_group == 'west', ],
        aes(x=year, y=n_strength, color=buoy))+
   geom_line(stat='identity')+
   facet_grid(season~buoy, scales="free", space="free_x",  labeller= variable_labeller2)+ ggtitle('Westerly Winds')
+
+```

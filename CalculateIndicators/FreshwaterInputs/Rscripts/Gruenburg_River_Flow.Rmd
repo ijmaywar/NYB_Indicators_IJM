@@ -29,7 +29,8 @@ library(lfstat)
 GetFlowMet<-function(gage_id){
   
   
-  #gage_id<-"01358000"
+  # gage_id<-"01358000"
+  # gage_id <- "n03020"
   dat<-importDVs(gage_id, code="00060", stat="00003")
   #assign water year values and reformat
   dat$dates<-as.POSIXlt(dat$dates)
@@ -79,7 +80,7 @@ GetFlowMet<-function(gage_id){
   CT.df$spring_center<-sBigz[1,9]
   #Fall_center
     
-    #Fall_center
+  #Fall_center
   fall$seasonal_volume<-cumsum(fall$val)
   thresh<-tail(fall$seasonal_volume,1)/2
   fall$sBigz<-fall$seasonal_volume > thresh
@@ -146,6 +147,7 @@ library(lfstat)
 library(waterData)
 
 hudson<-"01358000"#Hudson River at green island
+# hudson <- "403654074034101" # Hudson River at The Narrows
 flowdat_hudson<-GetFlowMet(hudson)#Run the function
 str(flowdat_hudson)#74 years of data
 
@@ -263,6 +265,6 @@ hud_flowFallCenter<-data.frame(Year = flowdat_hudson$wyear,
 flow<-rbind(hud_flowMean, hud_flowMAX, hud_flowSpringCenter, hud_flowFallCenter)
 
 setwd("~/Desktop/NYB Indicators/Final_timeseries")
-write.csv(flow, "RiverFlow_DEC_01_2021.csv") #Don't forget to change the name each year!
+write.csv(flow, "RiverFlow_OCT_23_2024.csv") #Don't forget to change the name each year!
 
 ```

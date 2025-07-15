@@ -3,12 +3,11 @@ library(oce)
 
 ###I have ~150 .cnv files in this folder
 ###They are ALL of the ones taken from the MEGAFOLDER
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data/CTD_NYOS")
-mypath<-"~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data/CTD_NYOS"
+setwd("/Users/ian/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data/CTD_NYOS")
+mypath<-"/Users/ian/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data/CTD_NYOS"
 
 ###This will generate of LIST of all of the file names it finds in mypath
-CTDfiles<-list.files(mypath)
-
+CTDfiles<-list.files(mypath,pattern = "\\.cnv$")
 
 hey<-read.ctd(CTDfiles[1], debug = 0,
               type = "SBE19")#read in the 100th CTD cast
@@ -48,13 +47,12 @@ wolf1<-data.frame(lat = hey1@metadata$latitude,
            c50_den = hd[c50Row,"density"])
 
 
-
-for(i in 2:length(CTDfiles)){
-  #i=126
+for(i in 1:length(CTDfiles)){
+  
   try(hey<-read.ctd(CTDfiles[i]))#read in the 100th CTD cast
   hey1<-ctdTrim(hey, method = "downcast")
-  #plot(hey)
-  #plot(hey1)
+  # plot(hey)
+  # plot(hey1)
   
   hd<-data.frame(hey1@data)
   hd$rowNum<-1:nrow(hd)
@@ -82,7 +80,5 @@ for(i in 2:length(CTDfiles)){
   print(i)
 }
 
-
-
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
-write.csv(wolf1, "CTD_seawolf_AUG6.csv")
+setwd("/Users/ian/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
+write.csv(wolf1, "CTD_seawolf_Oct16_2024.csv")

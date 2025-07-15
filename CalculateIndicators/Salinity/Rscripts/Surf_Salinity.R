@@ -10,16 +10,16 @@ library(effects)
 library(mgcViz)
 library(stringr)
 #####load required functiosn and shapefiles
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/Rfunctions")
+setwd("/Users/ian/Documents/GitHub/NYB_Indicators_Calculations-main/CalculateIndicators/Rfunctions")
 source("LabelPoints.R")
 
 #######Load the datasets
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
-ddd<-read.csv("WOD_CTD_format_D50_June24_2020.csv", header = TRUE)
+setwd("/Users/ian/Desktop/*NYB Indicators/CalculateIndicators/WaterTemperature/Data/")
+ddd<-read.csv("WOD_CTD_format_D50_Oct16_2024.csv", header = TRUE)
 ddd$date<-as.Date(ddd$date)
 ddd$data_source<-"WOD"
 
-sea<-read.csv("CTD_seawolf_AUG6.csv")
+sea<-read.csv("CTD_seawolf_Oct16_2024.csv")
 sea$date<-as.Date(sea$date)
 sea$data_source<-"SEAWOLF"
 
@@ -220,5 +220,6 @@ abline(v = 2012)
 fff<-rbind(MAB,fNYB, NES)
 
 ###write to csv
-setwd("~/Desktop/NYB Indicators/Final_timeseries")
-write.csv(fff, "SurfSal_insitu_AUG_13_2020.csv")
+setwd("/Users/ian/Desktop/*NYB Indicators/Final_timeseries")
+write.csv(fff, "SurfSal_insitu_Nov_17_2024.csv")
+

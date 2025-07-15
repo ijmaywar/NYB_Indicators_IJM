@@ -36,11 +36,11 @@ If cast 1 (i = 1) has 10 depths and associated temperature measurements (j = 10)
 This script brings in the datasets and shows what they look like. 
 ```{r}
 library(ncdf4)#the packge for .nc files
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data/LOTS OF WOD")
+setwd("/Users/ian/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data/WOD")
 
 ###These are the files that you get emaild from WODselect website
-file1<-("ocldb1597689792.2241_XBT.nc")#straight from WODselect download site
-file2<-("ocldb1597689792.2241_XBT2.nc")#straight from WODselect download site
+file1<-("ocldb1729700793.558003_XBT.nc")#straight from WODselect download site
+file2<-("ocldb1729700793.558003_XBT2.nc")#straight from WODselect download site
 con1 <- ncdf4::nc_open(file1)#the file connection
 con2<-ncdf4::nc_open(file2)#the file connection
 
@@ -270,8 +270,8 @@ finalDDD<-rbind(ddd_con1,ddd_con2)
 NOTE: Before moving on to part 3 I think its a good idea to write this to disk "finalDDD" and then clear the workspace completely because by this point it is pretty full of shit. 
 
 ```{r}
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
-write.csv(finalDDD,"WOD_XBT_format_D50_AUG_18_2020.csv")
+setwd("/Users/ian/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
+write.csv(finalDDD,"WOD_XBT_format_D50_OCT_23_2024.csv")
 rm(list = ls(all.names = TRUE))#will remove everything in workspace and hidden objects
 ```
 

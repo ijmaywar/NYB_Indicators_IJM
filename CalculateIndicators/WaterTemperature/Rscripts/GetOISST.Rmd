@@ -33,10 +33,13 @@ library(reshape2)
 
 #####Function 1 (get data)
 OISST_sub <- function(times, mypath){
-  oisst_res <- griddap(#x = "ncdc_oisst_v2_avhrr_by_time_zlev_lat_lon", 
-    #url = "https://www.ncei.noaa.gov/erddap/", 
-    x = "ncdcOisst2Agg_LonPM180", ###NEW TRU
-    url = "https://coastwatch.pfeg.noaa.gov/erddap/",###NEW TRY
+  oisst_res <- griddap(
+    # x = "ncdc_oisst_v2_avhrr_by_time_zlev_lat_lon", 
+    # url = "https://www.ncei.noaa.gov/erddap/", 
+    # x = "ncdcOisst2Agg_LonPM180", ###NEW TRU
+    # url = "https://coastwatch.pfeg.noaa.gov/erddap/griddap/",###NEW TRY
+
+    info("ncdcOisst2Agg_LonPM180", url = "https://coastwatch.pfeg.noaa.gov/erddap/"),
     
     time = times, 
     #depth = c(0, 0),
@@ -66,14 +69,15 @@ mypath<-"~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data"
 
 #####Running the following commands will take about 15 mintues
 #####I turned these off here,but you need to run these to access the datasets and store them somewher!!!
-#s
-  #OISST1 <- OISST_sub(c("1982-01-01T00:00:00Z", "1985-12-31T00:00:00Z"),mypath)
-  #OISST2 <- OISST_sub(c("1986-01-01T00:00:00Z", "1990-12-31T00:00:00Z"),mypath)
-  #OISST3 <- OISST_sub(c("1991-01-01T00:00:00Z", "1999-12-31T00:00:00Z"),mypath)
-  #OISST4 <- OISST_sub(c("2000-01-01T00:00:00Z", "2008-12-31T00:00:00Z"),mypath)
-  #OISST5 <- OISST_sub(c("2009-01-01T00:00:00Z", "2013-12-03T00:00:00Z"),mypath)
-  #OISST6 <- OISST_sub(c("2014-01-01T00:00:00Z", "2019-12-03T00:00:00Z"),mypath)
-  OISST7  <- OISST_sub(c("2020-01-01T00:00:00Z", "2020-04-01T00:00:00Z"),mypath) #most recent data update
+
+  # OISST1 <- OISST_sub(c("1982-01-01T12:00:00Z", "1985-12-31T12:00:00Z"),mypath)
+  # OISST2 <- OISST_sub(c("1986-01-01T00:00:00Z", "1990-12-31T12:00:00Z"),mypath)
+  OISST3 <- OISST_sub(c("1991-01-01T00:00:00Z", "1999-12-31T12:00:00Z"),mypath)
+  OISST4 <- OISST_sub(c("2000-01-01T00:00:00Z", "2008-12-31T12:00:00Z"),mypath)
+  OISST5 <- OISST_sub(c("2009-01-01T00:00:00Z", "2013-12-31T12:00:00Z"),mypath)
+  OISST6 <- OISST_sub(c("2014-01-01T00:00:00Z", "2019-12-31T12:00:00Z"),mypath)
+  OISST7  <- OISST_sub(c("2020-01-01T00:00:00Z", "2023-12-31T12:00:00Z"),mypath) # until the end of 2023
+
 ```
 
 Now you have six files with long strange names saved in **mypath** so these will get used in the next step.
@@ -113,15 +117,17 @@ OISST_prep <- function(filename){
 
 
 
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
-d1<-OISST_prep("a59ac185b8e5d9a34813fee58c0a9fdf.nc")
+setwd("/Users/ian/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data/")
+d1 <- OISST_prep("OISST7.nc")
+
 #d1$lon<-(360-d1$lon)*-1#fix lat long, dont need to do this anymore with new ERDDAP version
 d1$lat_lon<-paste(d1$lat, d1$lon, sep = "_")#this is just a unique id for each grid point
 d1sub<-d1[!duplicated(d1$lat_lon),]#get rid of all duplicate dmeasuremnts at a point
 
 #and here is the labeling function, inside it does lots of spatial overlays and fancystuff
 #####load required functiosn and shapefiles######
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/Rfunctions")
+
+setwd("/Users/ian/Documents/GitHub/NYB_Indicators_Calculations-main/CalculateIndicators/Rfunctions/")
 source("LabelPoints.R")
        
        
@@ -143,14 +149,14 @@ All of the above code was done to make an object called **tlabs** which now will
 ####These are all of the data created with GetSST
 
 setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
-d1<-OISST_prep("a59ac185b8e5d9a34813fee58c0a9fdf.nc")
-d2<-OISST_prep("79b6e789d3e145c094aae90f9600f8b0.nc")
-d3<-OISST_prep("b0988ceaf10f0d2f3287c9d5c4c05cfd.nc")
-d4<-OISST_prep("9bd1c68f26ce957283f2705a6f4d351b.nc")
-d5<-OISST_prep("d7a66efb0dd885bc6a6745e9921b6766.nc")
-d6<-OISST_prep("9e231e194f77722b4ec78467a053baf6.nc")
+d1<-OISST_prep("OISST1.nc")
+d2<-OISST_prep("OISST2.nc")
+d3<-OISST_prep("OISST3.nc")
+d4<-OISST_prep("OISST4.nc")
+d5<-OISST_prep("OISST5.nc")
+d6<-OISST_prep("OISST6.nc")
 #d1-d6 are the original 6 datasets, we can add new data below as it becomes available.
-d7<-OISST_prep("OISST_2020JAN_2020APR.nc")
+d7<-OISST_prep("OISST7.nc")
 
 ddd<-rbind(d1,d2,d3,d4,d5,d6,d7)
 rm(d1,d2,d3,d4,d5,d6,d7)
@@ -172,7 +178,7 @@ ddd<-merge(ddd,tlabs, by = "lat_lon")
 ###SAVE THIS DATA FRAME
 ### Then you dont need torepeat above steps next time you want to work on this
 
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
+setwd("/Users/ian/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
 write.csv(ddd, "L1_SST_data_ProcessedAUG30_2021.csv", row.names = FALSE)#takes awhile
 ```
 

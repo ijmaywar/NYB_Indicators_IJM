@@ -35,13 +35,13 @@ If cast 1 (i = 1) has 10 depths and associated temperature measurements (j = 10)
 This script brings in the datasets and shows what they look like. 
 ```{r}
 library(ncdf4)#the packge for .nc files
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
+setwd("/Users/ian/Desktop/*NYB Indicators/CalculateIndicators/WaterTemperature/Data/WOD")
 
 ###These are the files that you get emaild from WODselect website
-file1<-("ocldb1592943418.11094_CTD.nc")#straight from WODselect download site
-file2<-("ocldb1592943418.11094_CTD2.nc")#straight from WODselect download site
+file1 <- ("ocldb1729093373.1000158_CTD.nc")#straight from WODselect download site
+file2 <- ("ocldb1729093373.1000158_CTD2.nc")#straight from WODselect download site
 con1 <- ncdf4::nc_open(file1)#the file connection
-con2<-ncdf4::nc_open(file2)#the file connection
+con2 <- ncdf4::nc_open(file2)#the file connection
 
 ###heres just a look at the dataset, a map with points colored according to botom depth
 cfunk<-colorRampPalette(c("red","blue"))
@@ -151,6 +151,7 @@ Now use these functions to create a bunch of 'ctd' data frames from the connecti
 
 WIll TAKE ABOUT FIVE MINUTES TO RUN. 
 ```{r}
+library(oce)
 #####Prepare All data for con1
 ddd<-make_casts(con1)
 ctds1<-list()#this is the list that will contain individual CTD casts
@@ -283,8 +284,8 @@ finalDDD<-rbind(ddd_con1,ddd_con2)
 NOTE: Before moving on to part 3 I think its a good idea to write this to disk "finalDDD" and then clear the workspace completely because by this point it is pretty full of shit. 
 
 ```{r}
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
-write.csv(finalDDD,"WOD_CTD_format_D50_June24_2020.csv")
+setwd("/Users/ian/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
+write.csv(finalDDD,"WOD_CTD_format_D50_Oct16_2024.csv")
 rm(list = ls(all.names = TRUE))#will remove everything in workspace and hidden objects
 ```
 

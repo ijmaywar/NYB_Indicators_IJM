@@ -15,19 +15,19 @@ library(effects)
 library(mgcViz)
 library(stringr)
 #####load required functiosn and shapefiles
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/Rfunctions")
+setwd("/Users/ian/Documents/GitHub/NYB_Indicators_Calculations-main/CalculateIndicators/Rfunctions")
 source("LabelPoints.R")
 
 #######Load the datasets
 setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
-ddd<-read.csv("WOD_CTD_XBT_MBT_GLD_August30_2021.csv", header = TRUE)
-colnames(ddd)[18] <- "bot_temp"
+ddd<-read.csv("WOD_CTD_format_D50_Oct16_2024.csv", header = TRUE)
+# colnames(ddd)[18] <- "bot_temp" # which one is this supposed to beE???? which one did she rename?
 ddd$date <- as.character(ddd$date)
-ddd$date<-as.Date(ddd$date,tryFormats = c("%Y%m%d"))
+ddd$date<-as.Date(ddd$date,tryFormats = c("%Y-%m-%d"))
 ddd$date<-as.Date(ddd$date)
 ddd$data_source<-"WOD"
 
-sea<-read.csv("CTD_seawolf_NOV23_2021.csv")
+sea<-read.csv("CTD_seawolf_Oct16_2024.csv")
 sea$date<-as.Date(sea$date)
 sea$data_source<-"SEAWOLF"
 
@@ -67,14 +67,14 @@ ndf[is.na(ndf$EPU),"EPU"]<-"Not in NES"
 
 ########ANALYSIS FOR THE NYB##########
 NYB<-ndf[ndf$NYB %in% "NYB" == TRUE,]
-nrow(NYB)##22775 (old) now 38088
+nrow(NYB)##22775 (old) now 38088 - when I did this it was 9399...
 minN<-20##min number of obs per year (you choose) to retain data for an estimate. 
 ntab<-table(NYB$year_fac)#make a table
 ntab
 remove_these<-names(ntab[ntab < minN])#remove below minN
 ###subdat1 removes data for years with less than minNcasts and is used in analysis
 subdat1<-NYB[NYB$year_fac %in% remove_these == FALSE,]
-nrow(subdat1)#this is how many casts are used -> 38186
+nrow(subdat1)#this is how many casts are used -> 38186 - for IJM: 9384
 
 ######Display Data Density + TRIM
 table(subdat1$year)#casts per year for data used in analysis
@@ -273,8 +273,8 @@ fff<-rbind(MAB,fNYB, NES)
 #write.csv(fff, "BT_insitu_DEC_13_2020.csv")
 
 #saving just for NYB indicator time series
-setwd("~/Desktop/NYB Indicators/Final_timeseries")
-write.csv(fNYB, "BT_insitu_Nov_23_2021.csv")
+setwd("/Users/ian/Desktop/NYB Indicators/Final_timeseries")
+write.csv(fNYB, "BT_insitu_Oct_23_2024.csv")
 
 
 ####compare to NOAA version#####

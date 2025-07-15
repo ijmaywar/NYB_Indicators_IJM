@@ -6,14 +6,15 @@
 
 setwd("~/Desktop/NYB Indicators/Deriv")
 source("Deriv.R")
+library(dplyr)
 library(mgcv)
 library(ggplot2)
 #library(mgcViz)
 
 
 #######Load the datasets
-setwd("~/Desktop/NYB Indicators/NYB_Indicators_Calculations/Final_Timeseries_Figures/Timeseries_Files_2023")
-bt<-read.csv("BT_insitu_DEC_11_2023.csv", header = TRUE)
+setwd("/Users/ian/Desktop/NYB Indicators/Final_timeseries")
+bt<-read.csv("BT_insitu_Nov_17_2024.csv", header = TRUE)
 nyb = bt[bt$Loc == 'NYB',]
 nyb$Val_I <- nyb$Intercept + nyb$Val
 
@@ -31,7 +32,7 @@ winter1960 = winter[winter$Year >=1960, ]
 qwinter1960 = quantile(winter1960$Val_I, probs = c(.30,.70))
 
 # find the last 5 years mean
-mn_winter19605 = mean(winter1960$Val_I[winter1960$Year >= 2019])
+mn_winter19605 = mean(winter1960$Val_I[winter1960$Year %in% tail(sort(unique(winter1960$Year)),5)])
 # what quintile the data is in
 mn_winter19605 >qwinter1960
 
@@ -42,13 +43,13 @@ gam.check(mod_w)
 
 pdata_w <- with(winter, data.frame(Year = Year))
 p2_mod_w <- predict(mod_w, newdata = pdata_w,  type = "terms", se.fit = TRUE)
-intercept_w = 4.862334  # look at p2_mod and extract the intercept
+intercept_w = mod_w$coefficients[1]
 pdata_w <- transform(pdata_w, p2_mod_w = p2_mod_w$fit[,1], se2_w = p2_mod_w$se.fit[,1])
 
 #  Now that we have the model prediction, the next step is to calculate the first derivative
 #  Then determine which increases and decreases are significant
 Term = "Year"
-mod_w.d <- Deriv(mod_w, n=81) # n is the number of years
+mod_w.d <- Deriv(mod_w, n=length(unique(mod_w$model$Year)))
 mod_w.dci <- confint(mod_w.d, term = Term)
 mod_w.dsig <- signifD(pdata_w$p2_mod_w, d = mod_w.d[[Term]]$deriv,
                       +                    mod_w.dci[[Term]]$upper, mod_w.dci[[Term]]$lower)
@@ -61,20 +62,23 @@ lines(p2_mod_w+intercept_w ~ Year, data = pdata_w)
 lines(unlist(mod_w.dsig$incr)+intercept_w ~ Year, data = pdata_w, col = "blue", lwd = 3)
 lines(unlist(mod_w.dsig$decr)+intercept_w ~ Year, data = pdata_w, col = "red", lwd = 3)
 
-linearMod_w<- lm(Val_I ~ Year, data=winter[19:81, ])
+# Build linear regression based on data starting at 1960
+linearMod_w<- lm(Val_I ~ Year, data=winter %>% dplyr::filter(Year>=1960))
 summary(linearMod_w)
 
 wint_plot <- ggplot() + 
   geom_line(data = winter, aes(x = Year, y = Val_I), color = 'grey52') +
   geom_point(data = winter, aes(x = Year, y = Val_I), color = 'grey52') + 
   #geom_point(data = winter[42,], aes(x= Year, y = Val_I), shape = 17, size =3) +
-  geom_smooth(data = winter[19:81, ], aes(x = Year, y = Val_I), method = lm, se = FALSE, color = 'black') + 
-  geom_line(data=pdata_w, aes(x = Year, y = p2_mod_w+intercept_w), se = FALSE, color = 'black', linetype = 'twodash', size = 1) + 
+  geom_smooth(data = winter %>% dplyr::filter(Year>=1960), aes(x = Year, y = Val_I), method = lm, se = FALSE, color = 'black') + 
+  geom_line(data=pdata_w, aes(x = Year, y = p2_mod_w+intercept_w), color = 'black', linetype = 'twodash', size = 1) + 
   #geom_line(data = pdata_w, aes(y = unlist(mod_w.dsig$incr)+intercept_w, x = Year), color = "blue", size = 1) + 
   #geom_line(data = pdata_w, aes(y = unlist(mod_w.dsig$decr)+intercept_w, x = Year), color = 'red', size = 1) + 
   theme_bw() +
   labs (y = bquote("Temp (\u00B0C)"), x =' ',title = 'Winter') + 
   theme(plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face = 'bold'), axis.text= element_text(color = 'black', size = 12))
+
+wint_plot
 
 # SPRING
 
@@ -84,7 +88,7 @@ spring1960 = spring[spring$Year >=1960, ]
 qspring1960 = quantile(spring1960$Val_I, probs = c(.30,.70))
 
 # find the last 5 years mean
-mn_spring19605 = mean(spring1960$Val_I[spring1960$Year >= 2019])
+mn_spring19605 = mean(spring1960$Val_I[spring1960$Year %in% tail(sort(unique(spring1960$Year)),5)])
 # what quintile the data is in
 mn_spring19605 >qspring1960
 
@@ -97,13 +101,13 @@ gam.check(mod_sp)
 
 pdata_sp <- with(spring, data.frame(Year = Year))
 p2_mod_sp <- predict(mod_sp, newdata = pdata_sp,  type = "terms", se.fit = TRUE)
-intercept_sp = 6.680707   # look at p2_mod and extract the intercept
+intercept_sp = mod_sp$coefficients[[1]]   # look at p2_mod and extract the intercept
 pdata_sp <- transform(pdata_sp, p2_mod_sp = p2_mod_sp$fit[,1], se2_sp = p2_mod_sp$se.fit[,1])
 
 #  Now that we have the model prediction, the next step is to calculate the first derivative
 #  Then determine which increases and decreases are significant
 Term = "Year"
-mod_sp.d <- Deriv(mod_sp, n=82) # n is the number of years
+mod_sp.d <- Deriv(mod_sp, n=length(mod_sp$model$Year)) # n is the number of years
 mod_sp.dci <- confint(mod_sp.d, term = Term)
 mod_sp.dsig <- signifD(pdata_sp$p2_mod_sp, d = mod_sp.d[[Term]]$deriv,
                        +                    mod_sp.dci[[Term]]$upper, mod_sp.dci[[Term]]$lower)
@@ -124,21 +128,23 @@ spr_plot <- ggplot() +
   geom_point(data = spring, aes(x = Year, y = Val_I), color = 'grey52') + 
   #geom_point(data = spring[42,], aes(x= Year, y = Val_I), shape = 17, size =3) +
   geom_smooth(data = spring[spring$Year > 1959, ], aes(x = Year, y = Val_I), method = lm, se = FALSE, color = 'black') + 
-  geom_line(data=pdata_sp, aes(x = Year, y = p2_mod_sp+intercept_sp), se = FALSE, color = 'black', linetype = 'twodash', size = 1) + 
+  geom_line(data=pdata_sp, aes(x = Year, y = p2_mod_sp+intercept_sp), color = 'black', linetype = 'twodash', size = 1) + 
   geom_line(data = pdata_sp, aes(y = unlist(mod_sp.dsig$incr)+intercept_sp, x = Year), color = "blue", size = 1) + 
   geom_line(data = pdata_sp, aes(y = unlist(mod_sp.dsig$decr)+intercept_sp, x = Year), color = 'red', size = 1) + 
   theme_bw() +
   labs (y = bquote(" "), x = ' ', title = 'Spring') + 
   theme(plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face = 'bold'), axis.text= element_text(color = 'black', size = 12))
 
+spr_plot
+
 # SUMMER
 
-summer1960 = summer[summer$Year >=1960, ]
+summer1960 = summer[summer$Year >= 1960, ]
 
 qsummer1960 = quantile(summer1960$Val_I, probs = c(.30,.70))
 
 # find the last 5 years mean
-mn_summer19605 = mean(summer1960$Val_I[summer1960$Year >= 2019])
+mn_summer19605 = mean(summer1960$Val_I[summer1960$Year %in% tail(sort(unique(summer1960$Year)),5)])
 # what quintile the data is in
 mn_summer19605 >qsummer1960
 
@@ -149,13 +155,13 @@ gam.check(mod_su)
 
 pdata_su <- with(summer, data.frame(Year = Year))
 p2_mod_su <- predict(mod_su, newdata = pdata_su,  type = "terms", se.fit = TRUE)
-intercept_su = 9.210697  # look at p2_mod and extract the intercept
+intercept_su = mod_su$coefficients[[1]]  # look at p2_mod and extract the intercept
 pdata_su <- transform(pdata_su, p2_mod_su = p2_mod_su$fit[,1], se2_su = p2_mod_su$se.fit[,1])
 
 #  Now that we have the model prediction, the next step is to calculate the first derivative
 #  Then determine which increases and decreases are significant
 Term = "Year"
-mod_su.d <- Deriv(mod_su, n=80) # n is the number of years
+mod_su.d <- Deriv(mod_su, n=length(unique(mod_su$model$Year))) # n is the number of years
 mod_su.dci <- confint(mod_su.d, term = Term)
 mod_su.dsig <- signifD(pdata_su$p2_mod_su, d = mod_su.d[[Term]]$deriv,
                        +                    mod_su.dci[[Term]]$upper, mod_su.dci[[Term]]$lower)
@@ -176,12 +182,14 @@ sum_plot <- ggplot() +
   geom_point(data = summer, aes(x = Year, y = Val_I), color = 'grey52') + 
   #geom_point(data = summer[42,], aes(x= Year, y = Val_I), shape = 17, size =3) +
   geom_smooth(data = summer[summer$Year > 1959, ], aes(x = Year, y = Val_I), method = lm, se = FALSE, color = 'black') + 
-  geom_line(data=pdata_su, aes(x = Year, y = p2_mod_su+intercept_su), se = FALSE, color = 'black', linetype = 'twodash', size = 1) + 
-  geom_line(data = pdata_su, aes(y = unlist(mod_su.dsig$incr)+intercept_su, x = Year), color = "blue", size = 1) + 
-  geom_line(data = pdata_su, aes(y = unlist(mod_su.dsig$decr)+intercept_su, x = Year), color = 'red', size = 1) + 
+  geom_line(data=pdata_su, aes(x = Year, y = p2_mod_su+intercept_su), color = 'black', linetype = 'twodash', size = 1) +
+  geom_line(data = pdata_su, aes(y = unlist(mod_su.dsig$incr)+intercept_su, x = Year), color = "blue", size = 1) +
+  geom_line(data = pdata_su, aes(y = unlist(mod_su.dsig$decr)+intercept_su, x = Year), color = 'red', size = 1) +
   theme_bw() +
   labs (y = bquote("Temp (\u00B0C)"), x = 'Year', title = 'Summer') + 
   theme(plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face = 'bold'), axis.text= element_text(color = 'black', size = 12))
+
+sum_plot
 
 # FALL
 
@@ -190,7 +198,7 @@ fall1960 = fall[fall$Year >=1960, ]
 qfall1960 = quantile(fall1960$Val_I, probs = c(.30,.70))
 
 # find the last 5 years mean
-mn_fall19605 = mean(fall1960$Val_I[fall1960$Year >= 2019])
+mn_fall19605 = mean(fall1960$Val_I[fall1960$Year %in% tail(sort(unique(fall1960$Year)),5)])
 # what quintile the data is in
 mn_fall19605 >qfall1960
 
@@ -203,13 +211,13 @@ gam.check(mod_fa)
 
 pdata_fa <- with(fall, data.frame(Year = Year))
 p2_mod_fa <- predict(mod_fa, newdata = pdata_fa,  type = "terms", se.fit = TRUE)
-intercept_fa = 13.83598  # look at p2_mod and extract the intercept
+intercept_fa = mod_fa$coefficients[[1]]  # look at p2_mod and extract the intercept
 pdata_fa <- transform(pdata_fa, p2_mod_fa = p2_mod_fa$fit[,1], se2_fa = p2_mod_fa$se.fit[,1])
 
 #  Now that we have the model prediction, the next step is to calculate the first derivative
 #  Then determine which increases and decreases are significant
 Term = "Year"
-mod_fa.d <- Deriv(mod_fa, n=79) # n is the number of years
+mod_fa.d <- Deriv(mod_fa, n=length(unique(mod_fa$model$Year))) # n is the number of years
 mod_fa.dci <- confint(mod_fa.d, term = Term)
 mod_fa.dsig <- signifD(pdata_fa$p2_mod_fa, d = mod_fa.d[[Term]]$deriv,
                        +                    mod_fa.dci[[Term]]$upper, mod_fa.dci[[Term]]$lower)
@@ -230,12 +238,14 @@ fall_plot <- ggplot() +
   geom_point(data = fall, aes(x = Year, y = Val_I), color = 'grey52') + 
   #geom_point(data = fall[41,], aes(x= Year, y = Val_I), shape = 17, size =3) +
   geom_smooth(data = fall[fall$Year > 1959, ], aes(x = Year, y = Val_I), method = lm, se = FALSE, color = 'black') + 
-  geom_line(data = pdata_fa, aes(x = Year, y = p2_mod_fa+intercept_fa), se = FALSE, color = 'black', linetype = 'twodash', size = 1) + 
+  geom_line(data = pdata_fa, aes(x = Year, y = p2_mod_fa+intercept_fa), color = 'black', linetype = 'twodash', size = 1) + 
   geom_line(data = pdata_fa, aes(y = unlist(mod_fa.dsig$incr)+intercept_fa, x = Year), color = "blue", size = 1) + 
   geom_line(data = pdata_fa, aes(y = unlist(mod_fa.dsig$decr)+intercept_fa, x = Year), color = 'red', size = 1) + 
   theme_bw() +
   labs (y = bquote(" "), x = 'Year', title = 'Autumn') + 
   theme(plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face = 'bold'), axis.text= element_text(color = 'black', size = 12))
+
+fall_plot
 
 # Now plot all 4 together
 library(ggpubr)

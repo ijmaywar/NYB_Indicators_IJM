@@ -8,7 +8,7 @@
 #####load required functions
 #  You will need to download the functions from here https://gist.github.com/gavinsimpson/e73f011fdaaab4bb5a30
 
-setwd("~/Desktop/NYB Indicators/Deriv")
+setwd("/Users/ian/Desktop/NYB Indicators/Deriv")
 source("Deriv.R")
 library(mgcv)
 library(ggplot2)
@@ -16,13 +16,14 @@ library(ggplot2)
 library(ggpubr)
 
 #######Load the datasets
-setwd("/Users/nyelab/Desktop/NYB Indicators/NYB_Indicators_Calculations/Final_Timeseries_Figures/Timeseries_Files_2023")
-ds<-read.csv("TEUs_2023.csv", header = TRUE)
+setwd("/Users/ian/Desktop/NYB Indicators/Final_Timeseries_Figures/Timeseries_Files_2024")
+ds<-read.csv("TEUs_2024.csv", header = TRUE)
 
-qTEUs = quantile(ds[ds$Year > 1949, ]$TEUs, probs = c(.30, .70))
+qTEUs = quantile(ds$TEUs, probs = c(.30, .70))
 
 # find the last 5 years mean
-mn_TEUs5 = mean(ds[ds$Year > 1949, ]$TEUs[ds[ds$Year > 1949, ]$Year >= 2019])
+mn_TEUs5 = mean(ds[ds$Year >= 2019, ]$TEUs)
+
 # what percentile the data is in
 mn_TEUs5 >qTEUs
 
@@ -33,7 +34,7 @@ gam.check(mod)
 
 pdata <- with(ds, data.frame(Year = Year))
 p2_mod <- predict(mod, newdata = pdata,  type = "terms", se.fit = TRUE)
-intercept = 5961455   # look at p2_mod and extract the intercept
+intercept = 5956213   # look at p2_mod and extract the intercept
 pdata <- transform(pdata, p2_mod = p2_mod$fit[,1], se2 = p2_mod$se.fit[,1])
 
 #  Now that we have the model prediction, the next step is to calculate the first derivative
@@ -66,3 +67,8 @@ p1 = ggplot() +
   theme_bw() +
   labs (y = bquote("TEUs"), x = '', title = 'Cargo in Port of NY/NJ') + 
   theme(plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face = 'bold'), axis.text= element_text(color = 'black', size = 12))
+p1
+
+# Save as 800 x 400
+
+

@@ -1,7 +1,7 @@
 ########################################################
 #####THIS GETS THE NECESSARY SHAPE FILES#######
 ########################################################
-setwd("~/Desktop/NYB Indicators/Datasets/Shapefiles")
+setwd("/Users/ian/Documents/GitHub/NYB_Indicators_Calculations-main/Datasets/Shapefiles/")
 EPUshp<-readOGR("EPU_NOESTUARIES.shp")#Ecological production units
 NYBshp<-readOGR("PlanningArea_NYocean_NYSDOS.shp")#NYB
 Strata<-readOGR("Strata.shp")#NYB

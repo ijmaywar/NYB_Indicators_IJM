@@ -1,6 +1,6 @@
 ### River discharge metrics
 
-This function takes only a single input (the USGS gage # for a river of choice "in quotes") and will imports all available daily stream flow data for that site. Using this dataset, it will then calculate the following metrics. 
+This function takes only a single input (the USGS gage # for a river of choice "in quotes") and will imports all available daily stream flow data for that site. Using this dataset, it will then calculate the following metrics.
 
 1 date of center timing of flow mass ($date_CT), units are day of water year
 2 date of observed peak flow ($date_max_flow), units are day of water year
@@ -10,7 +10,7 @@ This function takes only a single input (the USGS gage # for a river of choice "
 6 date of spring onset of flow ($date_spring_onset) units are day of water year
 7 total annual discharge
 
-ADDED AUG 12, center of fall flow and center of spring flow as per Hodgkins et al. 2003 which is mroe relevant to the East Coast than some of the other ones. 
+ADDED AUG 12, center of fall flow and center of spring flow as per Hodgkins et al. 2003 which is more relevant to the East Coast than some of the other ones. 
 
 see Cayan et al. 2001 for spring onset of flow alogrithm description. Technically, the spring onset metric identifies the day on which the cumulative departure from the mean daily flow is most negative. This corresponds with the transition from winter low-flow conditions to the beginning of runoff in snow dominated systems but not sure how well this works in East Coast Rivers so should not be used probably.
 

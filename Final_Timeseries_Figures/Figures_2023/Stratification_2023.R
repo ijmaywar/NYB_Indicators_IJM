@@ -12,15 +12,19 @@ library(ggplot2)
 
 
 #######Load the datasets
-setwd("~/Desktop/NYB Indicators/NYB_Indicators_Calculations/Final_Timeseries_Figures/Timeseries_Files_2023")
-strat<-read.csv("Strat_seasonally_Jan_10_2024.csv", header = TRUE)
+setwd("/Users/ian/Desktop/NYB Indicators/Final_timeseries")
+strat<-read.csv("Strat_insitu_seasonally_OCT_22_2024.csv", header = TRUE)
 nyb = strat[strat$Loc == 'NYB',]
 nyb$Val_I <- nyb$Intercept + nyb$Val
 
-winter = nyb[nyb$season == 'winter',]
-spring = nyb[nyb$season == 'spring',]
-summer = nyb[nyb$season == 'summer',]
-fall = nyb[nyb$season == 'fall',]
+# strat_summer <- read.csv("Strat_insitu_summer_OCT_16_2024.csv", header = TRUE)
+# nyb_summer = strat_summer[strat_summer$Loc == 'NYB',]
+# nyb_summer$Val_I <- nyb_summer$Intercept + nyb_summer$Val
+
+winter = nyb[nyb$season == 'Winter',]
+spring = nyb[nyb$season == 'Spring',]
+summer = nyb[nyb$season == 'Summer',]
+fall = nyb[nyb$season == 'Fall',]
 
 
 # WINTER
@@ -40,7 +44,8 @@ gam.check(mod_w)
 
 pdata_w <- with(winter, data.frame(Year = Year))
 p2_mod_w <- predict(mod_w, newdata = pdata_w,  type = "terms", se.fit = TRUE)
-intercept_w = 0.0005219411    # look at p2_mod and extract the intercept
+# intercept_w = 0.0005219411    # look at p2_mod and extract the intercept
+intercept_w <- mod_w$coefficients[1]
 pdata_w <- transform(pdata_w, p2_mod_w = p2_mod_w$fit[,1], se2_w = p2_mod_w$se.fit[,1])
 
 #  Now that we have the model prediction, the next step is to calculate the first derivative

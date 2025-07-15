@@ -1,12 +1,11 @@
 ##Heatwave stats
 library(reshape2)
-
 library(heatwaveR)
-setwd("~/Desktop/NYB Indicators/CalculateIndicators/WaterTemperature/Data")
-ddd<-read.csv("L1_SST_data_ProcessedSEP30_2022.csv", header = TRUE)#takes awhile
+setwd("/Users/ian/Desktop/*NYB Indicators/CalculateIndicators/WaterTemperature/Data/")
+ddd<-read.csv("L1_SST_data_ProcessedOCT23_2024.csv", header = TRUE) #takes awhile
 ddd$t<-as.Date(ddd$t)
 
-bbb<-read.csv("Glorys_bottomT_SEP30_2022.csv", header = TRUE)#takes awhile
+bbb<-read.csv("Glorys_bottomT_Nov_18_2024.csv", header = TRUE)#takes awhile
 bbb$t<-as.Date(bbb$t)
 
 #####Create Single Time Series (daily avg.) for each EPU
@@ -24,7 +23,7 @@ wholeAvg<-block_average(mhw)
 wholeAvg<-melt(wholeAvg, id.vars = c("year"))
 
 #####Create Single Time Series (daily avg.) for each EPU
-dat2<-aggregate(temp ~ t + EPU, FUN =mean, data = bbb)#make the time series for each EPU
+dat2<-aggregate(temp ~ t + EPU, FUN = mean, data = bbb)#make the time series for each EPU
 dlev2<-unique(dat2$EPU)#4 levels, one for each EPU
 dat2<-dat2[dat2$EPU %in% "MAB" == "TRUE",]
 plot(dat2$t, dat2$temp, type = "l")
@@ -81,8 +80,8 @@ NYB<-data.frame(Year = wholeAvg$year,
                           Loc = "NYB",
                           N = NA)
 
-write.csv(mhw$climatology,'mhw_clim_updated_SEP30_2022.csv')
-write.csv(ts,'ts_updated_SEP30_2022.csv')
+write.csv(mhw$climatology,'mhw_clim_updated_OCT24_2024.csv')
+write.csv(ts,'ts_updated_OCT24_2024.csv')
 
 event_line(mhw, spread = 180, metric = "intensity_cumulative", 
            start_date = "1982-01-01", end_date = "2014-12-31")#very cool plot
@@ -107,8 +106,8 @@ NYB_b<-data.frame(Year = wholeAvg2$year,
                 Loc = "NYB",
                 N = NA)
 
-write.csv(mhw2$climatology,'mhw_b_clim_updated_SEP30_2022.csv')
-write.csv(ts2,'ts_b_updated_SEP30_2022.csv')
+write.csv(mhw2$climatology,'mhw_b_clim_updated_Nov_18_2024.csv')
+write.csv(ts2,'ts_b_updated_Nov_18_2024.csv')
 
 event_line(mhw2, spread = 180, metric = "intensity_cumulative", 
            start_date = "1993-01-01", end_date = "2014-12-31")#very cool plot
@@ -177,6 +176,7 @@ for(i in 1:length(varz_b)){
 
 
 ###write to csv
-setwd("~/Desktop/NYB Indicators/NYB_Indicators_Calculations/Final_Timeseries_Figures/Timeseries_Files_2022")
-write.csv(MHWs, "MarineHeatwaves_Sep_30_2022.csv")
-write.csv(MHWs_b, 'Bottom_MarineHeatwaves_Sep_30_2022.csv')
+setwd("/Users/ian/Desktop/*NYB Indicators/Final_Timeseries_Figures/Timeseries_Files_2024")
+write.csv(MHWs, "MarineHeatwaves_Oct_24_2024.csv")
+write.csv(MHWs_b, 'Bottom_MarineHeatwaves_Nov_18_2024.csv')
+

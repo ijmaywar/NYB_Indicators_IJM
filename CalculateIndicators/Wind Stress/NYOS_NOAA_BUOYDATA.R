@@ -1,7 +1,6 @@
 # GET HISTORICAL NOAA BUOY DATA FROM STATIONS OF INTEREST
 # This script will grab standard meteorological data from NOAA National Buoy Data Center
 
-
 # Ellie Heywood
 
 library(rnoaa) # package to access the NOAA Buoy Data Center
@@ -19,7 +18,8 @@ SOI <- stations[grep(stations$description, pattern = "Texas Tower"), ] # Grabs t
 
 #run it like this
 years <- seq(2009, 2019, 1)
-buoy_data <- buoy(dataset = 'stdmet', buoyid = SOI$station, year = years)
+buoy(dataset = 'stdmet', buoyid = SOI$station, year = years,verbose=TRUE)
+buoy_data <- buoy(dataset = 'stdmet', buoyid = SOI$station, year = years,verbose=TRUE)
 buoy_data$data$datetime <- as.POSIXct(strptime(buoy_data$data$time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC"))
 summary(buoy_data$data$datetime) # only grabs 6 months
 
@@ -40,14 +40,14 @@ getallyears<-function(buoy_id){
 
 ###Running the function takes a list of the bouy ID and then years
 ###Like this here below
-end_year<-2022 # designate the end year for last year of data
+end_year<-2023 # designate the end year for last year of data
 
 #here you gotta pick one, then you will need to change a few things below
 #buoy_id1<-list("SDHN4", 2004:end_year)#Sandy Hook, NJ. 2004 to present
-buoy_id2<-list("44065", 2008:end_year)#NY HARBOR 2008 to present
+buoy_nyh_dl<-list("44065", 2008:end_year)#NY HARBOR 2008 to present
 #buoy_id3<-list("44091", 2014:end_year)#Barnegat, NJ 2014 to present
-buoy_id4<-list("44025", c(1975:1980, 1991:end_year))#Long Island 30 miles offshore from ISLIP
-buoy_id5<-list("44066",2009:end_year)#Texas Tower, 75 M from Long Beach, NJ. 2009 to present
+buoy_isl_dl<-list("44025", c(1975:1980, 1991:end_year))#Long Island 30 miles offshore from ISLIP
+buoy_tt_dl<-list("44066",2009:end_year)#Texas Tower, 75 M from Long Beach, NJ. 2009 to present
 #buoy_id6<-list("44069",2016:end_year)# Great South Bay, NY 2016 to present
 #buoy_id7<-list("44017", c(2002:2011,2013:end_year))# Montauk Point Offshore, 2002 to present
 #buoy_id8<-list("MTKN6", 2004:end_year)# Montauk Point, Inshore 2004 to present
@@ -56,46 +56,65 @@ buoy_id5<-list("44066",2009:end_year)#Texas Tower, 75 M from Long Beach, NJ. 200
 
 
 ###Here is an example of what the input looks like
-buoy_id4#this is your input tothe function
-texas_tower_buoy <- getallyears(buoy_id4) 
+buoy_tt_dl#this is your input tothe function
+texas_tower_buoy <- getallyears(buoy_tt_dl) 
 
-buoy4 <- texas_tower_buoy
+buoytt <- texas_tower_buoy
 
-datetime<-as.POSIXct(strptime(buoy4$time,"%Y-%m-%dT%H:%M:%OS", tz = "UTC"))
+datetime<-as.POSIXct(strptime(buoytt$time,"%Y-%m-%dT%H:%M:%OS", tz = "UTC"))
+buoytt$datetime<-datetime
+which(is.na(buoytt$datetime))
 
-buoy4$datetime<-datetime
-buoy4$year<-year(buoy4$datetime)
-buoy4$yday<-yday(buoy4$datetime)
-buoy4$month<-month(buoy4$datetime, label = TRUE)
-str(buoy4) # the dataset has a buncha shit
+buoytt$year<-year(buoytt$datetime)
+
+buoytt$yday<-yday(buoytt$datetime)
+length(unique(buoytt$yday))
+
+buoytt$month<-month(buoytt$datetime, label = TRUE)
+str(buoytt) # the dataset has a buncha shit
+
+
 ###
-buoy_id2# NY Harbor
-ny_harbor_buoy <- getallyears(buoy_id2) 
+buoy_nyh_dl# NY Harbor
+ny_harbor_buoy <- getallyears(buoy_nyh_dl) 
 
-buoy2 <- ny_harbor_buoy
+buoynyh <- ny_harbor_buoy
 
-datetime<-as.POSIXct(strptime(buoy2$time,"%Y-%m-%dT%H:%M:%OS", tz = "UTC"))
+datetime<-as.POSIXct(strptime(buoynyh$time,"%Y-%m-%dT%H:%M:%OS", tz = "UTC"))
+buoynyh$datetime<-datetime
+which(is.na(buoynyh$datetime))
 
-buoy2$datetime<-datetime
-buoy2$year<-year(buoy2$datetime)
-buoy2$yday<-yday(buoy2$datetime)
-buoy2$month<-month(buoy4$datetime, label = TRUE)
-str(buoy2) # the dataset has a buncha shit
+buoynyh$year<-year(buoynyh$datetime)
+
+buoynyh$yday<-yday(buoynyh$datetime)
+length(unique(buoynyh$yday))
+
+buoynyh$month<-month(buoynyh$datetime, label = TRUE)
+str(buoynyh) # the dataset has a buncha shit
 
 ### South of Islip
 
-buoy_id5#this is your input to the function
-islip_buoy <- getallyears(buoy_id5) 
+buoy_isl_dl#this is your input to the function
+islip_buoy <- getallyears(buoy_isl_dl) 
 
-buoy5 <- islip_buoy
+buoyisl <- islip_buoy
 
-datetime<-as.POSIXct(strptime(buoy5$time,"%Y-%m-%dT%H:%M:%OS", tz = "UTC"))
+datetime<-as.POSIXct(strptime(buoyisl$time,"%Y-%m-%dT%H:%M:%OS", tz = "UTC"))
+buoyisl$datetime<-datetime
+which(is.na(buoytt$datetime))
 
-buoy5$datetime<-datetime
-buoy5$year<-year(buoy5$datetime)
-buoy5$yday<-yday(buoy5$datetime)
-buoy5$month<-month(buoy5$datetime, label = TRUE)
-str(buoy5) # the dataset has a buncha shit
+buoyisl$year<-year(buoyisl$datetime)
+buoyisl$yday<-yday(buoyisl$datetime)
+length(unique(buoynyh$yday))
+buoyisl$month<-month(buoyisl$datetime, label = TRUE)
+str(buoyisl) # the dataset has a buncha shit
+
+#################### SAVE BUOY CSVs ############################################
+# This code never saves windspeed CSVs from buoys - I'm guessing I gotta do this:
+setwd("/Users/ian/Desktop/NYB Indicators/Final_Timeseries_Figures/Timeseries_Files_2023/")
+write.csv(buoynyh,"Wind_buoynyh_Oct_15_2024.csv")
+write.csv(buoytt,"Wind_buoytt_Oct_15_2024.csv")
+write.csv(buoyisl,"Wind_buoyisl_Oct_15_2024.csv")
 
 #################### WIND SPEED #######################################
 # Put windspeed in comprehensible terms (currently m/s)
@@ -157,13 +176,16 @@ drag_coefficient <- 0.0015
 #1hPa = 100Pa
 buoy4$rho_air <- (buoy4$air_pressure*100)/(gas_constant * (buoy4$air_temperature+273.15))
 buoy4$wind_stress <- buoy4$rho_air*drag_coefficient*(buoy4$wind_spd^2) # bouy wind speed measurement at 5m
-buoy4$year2 <- format(buoy4$time, "%Y")
+# buoy4$year2 <- format(buoy4$time, "%Y")
+# buoy4$year2 <- as.character(year(buoy4$datetime))
 buoy4$date <- buoy4$datetime
 buoy4$seas <- mkseas(x = buoy4, width = "DJF")
 df2_4 <- aggregate(wind_stress ~ seas + year, data = buoy4, mean)
 df3_4 <- aggregate(wind_dir ~ seas + year, data = buoy4, mean)
 df4_4 <- aggregate(wind_spd ~ seas + year, data = buoy4, mean)
-wind_spd = df4_4$wind_spd[1:142]
+# wind_spd = df4_4$wind_spd[1:142]
+# I changed this to 144 so that the rows match df3_4...
+wind_spd = df4_4$wind_spd[1:144]
 df5_4 = cbind(df3_4, wind_spd)
 
 df5_4$wind_dir[df5_4$wind_dir == 0] <- 360
@@ -194,7 +216,7 @@ ggplot(data = wind_winter_4, aes(x = year, y = y_axis)) +
   plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face = 'bold'), axis.text= element_text(color = 'black', size = 12))
 
 
-ggplot(data = wind_spring, aes(x = year, y = y_axis)) +
+ggplot(data = wind_spring_4, aes(x = year, y = y_axis)) +
   # Here we create the wind vectors as a series of segments with arrow tips
   geom_segment(aes(x = year, xend = year + u*wind_scale, y = 0, yend = v*wind_scale), 
                arrow = arrow(length = unit(0.15, 'cm')), size = 0.5, alpha = 0.7) +
@@ -211,7 +233,7 @@ ggplot(data = wind_spring, aes(x = year, y = y_axis)) +
         axis.text.y = element_text(size = 8),
         plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face = 'bold'), axis.text= element_text(color = 'black', size = 12))
 
-ggplot(data = wind_summer, aes(x = year, y = y_axis)) +
+ggplot(data = wind_summer_4, aes(x = year, y = y_axis)) +
   # Here we create the wind vectors as a series of segments with arrow tips
   geom_segment(aes(x = year, xend = year + u*wind_scale, y = 0, yend = v*wind_scale), 
                arrow = arrow(length = unit(0.15, 'cm')), size = 0.5, alpha = 0.7) +
@@ -228,7 +250,7 @@ ggplot(data = wind_summer, aes(x = year, y = y_axis)) +
         axis.text.y = element_text(size = 8),
         plot.title=element_text(size = 16,face = 'bold',hjust = 0.5), axis.title=element_text(size = 14, face = 'bold'), axis.text= element_text(color = 'black', size = 12))
 
-ggplot(data = wind_fall, aes(x = year, y = y_axis)) +
+ggplot(data = wind_fall_4, aes(x = year, y = y_axis)) +
   # Here we create the wind vectors as a series of segments with arrow tips
   geom_segment(aes(x = year, xend = year + u*wind_scale, y = 0, yend = v*wind_scale), 
                arrow = arrow(length = unit(0.15, 'cm')), size = 0.5, alpha = 0.7) +
@@ -247,24 +269,26 @@ ggplot(data = wind_fall, aes(x = year, y = y_axis)) +
 
 ###
 
-buoy2$rho_air <- (buoy2$air_pressure*100)/(gas_constant * (buoy2$air_temperature+273.15))
-buoy2$wind_stress <- buoy2$rho_air*drag_coefficient*(buoy2$wind_spd^2) # bouy wind speed measurement at 5m
-buoy2$year <- format(buoy2$time, "%Y")
-buoy2$date <- buoy2$datetime
-buoy2$seas <- mkseas(x = buoy2, width = "DJF")
-df2_2 <- aggregate(wind_stress ~ seas + year, data = buoy2, mean)
-df3_2 <- aggregate(wind_dir ~ seas + year, data = buoy2, mean)
-df4_2 <- aggregate(wind_spd ~ seas + year, data = buoy2, mean)
+## I LEFT OFF HERE - MATCH THIS WITH WHAT I DID FOR BUOY4
+
+buoynyh$rho_air <- (buoynyh$air_pressure*100)/(gas_constant * (buoynyh$air_temperature+273.15))
+buoynyh$wind_stress <- buoynyh$rho_air*drag_coefficient*(buoynyh$wind_spd^2) # bouy wind speed measurement at 5m
+# buoynyh$year <- format(buoynyh$time, "%Y")
+buoynyh$date <- buoynyh$datetime
+buoynyh$seas <- mkseas(x = buoynyh, width = "DJF")
+df2_2 <- aggregate(wind_stress ~ seas + year, data = buoynyh, mean)
+df3_2 <- aggregate(wind_dir ~ seas + year, data = buoynyh, mean)
+df4_2 <- aggregate(wind_spd ~ seas + year, data = buoynyh, mean)
 ###
 
-buoy5$rho_air <- (buoy5$air_pressure*100)/(gas_constant * (buoy5$air_temperature+273.15))
-buoy5$wind_stress <- buoy5$rho_air*drag_coefficient*(buoy5$wind_spd^2) # bouy wind speed measurement at 5m
-buoy5$year <- format(buoy5$time, "%Y")
-buoy5$date <- buoy5$datetime
-buoy5$seas <- mkseas(x = buoy5, width = "DJF")
-df2_5 <- aggregate(wind_stress ~ seas + year, data = buoy5, mean)
-df3_5 <- aggregate(wind_dir ~ seas + year, data = buoy5, mean)
-df4_5 <- aggregate(wind_spd ~ seas + year, data = buoy5, mean)
+buoyisl$rho_air <- (buoyisl$air_pressure*100)/(gas_constant * (buoyisl$air_temperature+273.15))
+buoyisl$wind_stress <- buoyisl$rho_air*drag_coefficient*(buoyisl$wind_spd^2) # bouy wind speed measurement at 5m
+# buoyisl$year <- format(buoyisl$time, "%Y")
+buoyisl$date <- buoyisl$datetime
+buoyisl$seas <- mkseas(x = buoyisl, width = "DJF")
+df2_5 <- aggregate(wind_stress ~ seas + year, data = buoyisl, mean)
+df3_5 <- aggregate(wind_dir ~ seas + year, data = buoyisl, mean)
+df4_5 <- aggregate(wind_spd ~ seas + year, data = buoyisl, mean)
 
 ##
 library(tidyverse)
@@ -284,8 +308,7 @@ df4_2 %>%
   )
 
 ###write to csv
-setwd("~/Desktop/NYB Indicators/NYB_Indicators_Calculations/Final_Timeseries_Figures/Timeseries_Files_2022")
-write.csv(df4_4, "Mean_seasonal_wind_stress_TT_Nov_15_2022.csv")
-write.csv(df4_5, "Mean_seasonal_wind_stress_LI_Nov_15_2022.csv")
-write.csv(df4_2, "Mean_seasonal_wind_stress_NY_Nov_15_2022.csv")
-
+setwd("/Users/ian/Desktop/NYB Indicators/Final_Timeseries_Figures/Timeseries_Files_2023/")
+write.csv(df4_4, "Mean_seasonal_wind_stress_TT_Oct_15_2024.csv")
+write.csv(df4_5, "Mean_seasonal_wind_stress_LI_Oct_15_2024.csv")
+write.csv(df4_2, "Mean_seasonal_wind_stress_NY_Oct_15_2024.csv")
